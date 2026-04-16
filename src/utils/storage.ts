@@ -8,7 +8,7 @@ import {
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { StorageFileInfo } from "./types";
+import { StorageFileInfo, UploadedPart } from "./types";
 
 class Storage {
   private readonly s3: S3Client;
@@ -55,7 +55,7 @@ class Storage {
   async completeFileUpload(
     Key: string,
     UploadId: string,
-    Parts: { ETag: string; PartNumber: number }[],
+    Parts: UploadedPart[],
   ) {
     await this.s3.send(
       new CompleteMultipartUploadCommand({

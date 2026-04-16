@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
+import FileUploadContext from "@/components/file-upload-controller";
 
 const poppins = Poppins({
-  weight: ["400", "700"],
+  weight: ["400", "500", "700"],
 });
 
 export const geistSans = Geist({
@@ -25,9 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.className} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <Header />
-        {children}
+      <body className="min-h-full flex flex-col dark:bg-neutral-950 dark:text-white">
+        <FileUploadContext>
+          <Header />
+          {children}
+        </FileUploadContext>
       </body>
     </html>
   );
