@@ -17,36 +17,36 @@ const FileView = async () => {
         name: "test.mp4",
         size: 200 * 1024 * 1024,
         isFolder: false,
-        key: "test.mp4",
-        created_at: "",
+        Key: "test.mp4",
+        created_at: new Date().toISOString(),
       },
       {
         name: "bondoocks",
         size: 200 * 1024 * 1024,
         isFolder: true,
-        key: "bondocks",
-        created_at: "",
+        Key: "bondocks",
+        created_at: new Date().toISOString(),
       },
       {
         name: "Invincible",
         size: 200 * 1024 * 1024,
         isFolder: true,
-        key: "Invincible",
-        created_at: "",
+        Key: "Invincible",
+        created_at: new Date().toISOString(),
       },
       {
         name: "test1.mp4",
         size: 200 * 1024 * 1024,
         isFolder: false,
-        key: "test1.mp4",
-        created_at: "",
+        Key: "test1.mp4",
+        created_at: new Date().toISOString(),
       },
     ],
   };
   return (
-    <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 px-8 py-6">
+    <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 px-8 py-6">
       {fileInfos.files.map((fileInfo) => (
-        <FileCard {...fileInfo} key={fileInfo.key} />
+        <FileCard {...fileInfo} key={fileInfo.Key} />
       ))}
     </section>
   );

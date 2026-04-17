@@ -2,15 +2,16 @@
 
 import { createUploadFunction, FileUploader } from "@/utils/file-uploader";
 import { ActiveFileUpload } from "@/utils/types";
-import { useEffect, useState, createContext, useMemo } from "react";
+import { useState, createContext, useMemo } from "react";
+import InfoPopup from "./info-popup";
 
 interface UploadControls {
   hasActiveUploads: boolean;
-  upload: (file: File, settings: Record<string, string>) => void;
+  upload: (file: File, settings: Record<string, string>) => Promise<void>;
   continueUpload: (UploadId: string) => void;
 }
-const ActiveUploadsContext = createContext<ActiveFileUpload[]>([]);
-const UploadControlsContext = createContext<UploadControls | null>(null);
+export const ActiveUploadsContext = createContext<ActiveFileUpload[]>([]);
+export const UploadControlsContext = createContext<UploadControls | null>(null);
 const FileUploadController = ({ children }: { children: React.ReactNode }) => {
   const [activeUploads, setActiveUploads] = useState<ActiveFileUpload[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
@@ -45,11 +46,17 @@ const FileUploadController = ({ children }: { children: React.ReactNode }) => {
     }),
     [activeUploads],
   );
-  useEffect(() => {}, []);
+
   return (
     <ActiveUploadsContext value={activeUploads}>
       <UploadControlsContext value={uploadControls}>
         {children}
+        <InfoPopup
+          open={errorMessage !== ""}
+          onClose={() => setErrorMessage("")}
+        >
+          <p className="text-sm text-center">{errorMessage}</p>
+        </InfoPopup>
       </UploadControlsContext>
     </ActiveUploadsContext>
   );

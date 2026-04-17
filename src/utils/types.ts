@@ -1,6 +1,6 @@
 export interface StorageFileInfo {
   name: string;
-  key: string;
+  Key: string;
   size: number;
   isFolder: boolean;
   created_at: string;
@@ -18,4 +18,5 @@ export interface ActiveFileUpload {
   uploadedParts: UploadedPart[];
   Key: string;
   errorMessage: string;
+  isUploading: boolean;
 }

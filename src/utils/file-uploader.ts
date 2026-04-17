@@ -91,6 +91,16 @@ export class FileUploader {
     uploadedParts: UploadedPart[],
     setState: Dispatch<SetStateAction<ActiveFileUpload[]>>,
   ) {
+    setState((prev) =>
+      prev.map((activeUpload) => {
+        if (activeUpload.uploadId === UploadId)
+          return {
+            ...activeUpload,
+            isUploading: true,
+          };
+        return activeUpload;
+      }),
+    );
     try {
       for (const PartNumber of partsToUpload) {
         const sliceStart = (PartNumber - 1) * this.chunkSize;
@@ -130,6 +140,7 @@ export class FileUploader {
           if (activeUpload.uploadId === UploadId)
             return {
               ...activeUpload,
+              isUploading: false,
               errorMessage: "Upload error",
             };
           return activeUpload;
@@ -156,6 +167,7 @@ export const createUploadFunction =
         partsToUpload: Array.from({ length: parts }, (_, i) => i + 1),
         uploadedParts: [],
         errorMessage: "",
+        isUploading: true,
       };
       FileUploader.uploadFile(
         file,
