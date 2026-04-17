@@ -17,11 +17,13 @@ export class FileUploader {
   static readonly chunkSize = 1024 * 1024 * 7;
   static async fetchUploadId(
     filename: string,
+    contentType: string,
     Metadata: Record<string, string>,
   ) {
     const payload: StorageUploadIdRequest = {
       Key: filename,
       Metadata,
+      contentType,
     };
     const response = await withRetry({
       func: () =>
@@ -159,7 +161,11 @@ export const createUploadFunction =
     const Key = "pending/" + file.name;
     const parts = Math.ceil(file.size / FileUploader.chunkSize);
     try {
-      const UploadId = await FileUploader.fetchUploadId(Key, settings);
+      const UploadId = await FileUploader.fetchUploadId(
+        Key,
+        file.type,
+        settings,
+      );
       const activeUploadState: ActiveFileUpload = {
         file,
         Key,

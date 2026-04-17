@@ -3,6 +3,7 @@ import {
   CompleteMultipartUploadCommand,
   CreateMultipartUploadCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
   ListObjectsV2Command,
   S3Client,
   UploadPartCommand,
@@ -24,15 +25,20 @@ class Storage {
     );
   }
 
+  async getFileUrl(Key: string) {
+    const command = new GetObjectCommand({ Bucket: this.bucket, Key });
+    return await getSignedUrl(this.s3, command, { expiresIn: 3600 });
+  }
+
   async getUploadId(
-    filename: string,
+    Key: string,
     ContentType: string,
     Metadata: Record<string, string>,
   ) {
     const response = await this.s3.send(
       new CreateMultipartUploadCommand({
         Bucket: this.bucket,
-        Key: filename,
+        Key,
         ContentType,
         Metadata,
       }),

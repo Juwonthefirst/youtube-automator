@@ -9,6 +9,7 @@ interface UploadControls {
   hasActiveUploads: boolean;
   upload: (file: File, settings: Record<string, string>) => Promise<void>;
   continueUpload: (UploadId: string) => void;
+  cancelUpload: (UploadId: string) => Promise<void>;
 }
 export const ActiveUploadsContext = createContext<ActiveFileUpload[]>([]);
 export const UploadControlsContext = createContext<UploadControls | null>(null);
@@ -41,6 +42,18 @@ const FileUploadController = ({ children }: { children: React.ReactNode }) => {
           upload.partsToUpload,
           upload.uploadedParts,
           setActiveUploads,
+        );
+      },
+      cancelUpload: async (UploadId: string) => {
+        const upload = activeUploads.find(
+          (activeUpload) => activeUpload.uploadId === UploadId,
+        );
+        if (!(upload && upload.file)) return;
+        await FileUploader.cancelUpload(UploadId, upload.Key);
+        setActiveUploads(
+          activeUploads.filter(
+            (activeUpload) => activeUpload.uploadId !== UploadId,
+          ),
         );
       },
     }),
