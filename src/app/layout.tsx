@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.className} h-full antialiased`}>
-      <body className="min-h-full flex flex-col dark:bg-neutral-950 dark:text-white">
+      <body className="min-h-full flex flex-col dark:bg-neutral-950 dark:text-white noisy-background">
         <FileUploadContext>
           <Header />
           {children}

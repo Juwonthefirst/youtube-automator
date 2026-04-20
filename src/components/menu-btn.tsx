@@ -25,7 +25,7 @@ const MenuBtn = (props: Props) => {
       {isOpen && (
         <dialog
           open
-          className="absolute text-sm whitespace-nowrap flex flex-col gap-1 z-10 bg-white dark:text-white dark:bg-black border-black/20 dark:border-white/20 border-[1.5px] rounded-xl p-1.5 shadow-lg "
+          className="absolute -left-10 text-sm whitespace-nowrap flex flex-col gap-1 z-10 bg-white dark:text-white dark:bg-black border-black/20 dark:border-white/20 border-[1.5px] rounded-xl p-1.5 shadow-lg "
         >
           <MutationBtn
             mutationFn={() =>
