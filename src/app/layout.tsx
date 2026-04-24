@@ -26,10 +26,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${poppins.className} h-full antialiased`}>
-      <body className="min-h-full flex flex-col dark:bg-neutral-950 dark:text-white noisy-background">
+      <body className="min-h-full flex flex-col dark:bg-neutral-950 dark:text-white">
         <FileUploadContext>
           <Header />
-          {children}
+          <main className="bg-neutral-50 dark:bg-neutral-950 flex-1 noisy-background px-6 lg:px-8 py-4">
+            {children}
+          </main>
         </FileUploadContext>
       </body>
     </html>

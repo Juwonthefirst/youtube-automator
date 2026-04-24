@@ -6,10 +6,13 @@ import {
   GetObjectCommand,
   ListObjectsV2Command,
   S3Client,
+  S3ServiceException,
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { StorageFileInfo, UploadedPart } from "./types";
+import { StorageFolderInfo, UploadedPart } from "./types";
+import path from "path";
+import { notFound } from "next/navigation";
 
 class Storage {
   private readonly s3: S3Client;
@@ -19,15 +22,52 @@ class Storage {
     this.bucket = process.env.BUCKET_NAME!;
   }
 
-  async listFileinfos(parent?: string): Promise<StorageFileInfo[]> {
+  async listChildren(parentKey?: string) {
+    if (parentKey && !parentKey.endsWith("/")) parentKey += "/";
     const response = await this.s3.send(
-      new ListObjectsV2Command({ Bucket: this.bucket }),
+      new ListObjectsV2Command({
+        Bucket: this.bucket,
+        Delimiter: "/",
+        Prefix: parentKey,
+      }),
     );
+
+    const subFolders = (response.CommonPrefixes || []).map<StorageFolderInfo>(
+      (subFolder) => ({
+        name: path.parse(subFolder.Prefix!).base,
+        Key: subFolder.Prefix!,
+      }),
+    );
+
+    const files = [];
+    for (const file of response.Contents || [])
+      files.push({
+        name: path.parse(file.Key!).base,
+        Key: file.Key!,
+        size: file.Size || 0,
+        created_at: file.LastModified?.toISOString() || "",
+        thumbnailURL: await this.getThumbnailUrl(file.Key!),
+      });
+
+    return {
+      files,
+      subFolders,
+    };
   }
 
   async getFileUrl(Key: string) {
     const command = new GetObjectCommand({ Bucket: this.bucket, Key });
     return await getSignedUrl(this.s3, command, { expiresIn: 3600 });
+  }
+
+  async getThumbnailUrl(originFileKey: string) {
+    if (originFileKey.startsWith("thumbnails"))
+      return await this.getFileUrl(originFileKey);
+
+    const originFilePath = originFileKey.split(".");
+    originFilePath[originFilePath.length - 1] = "webp";
+    const thumbnailKey = "thumbnails/" + originFilePath.join(".");
+    return await this.getFileUrl(thumbnailKey);
   }
 
   async getUploadId(
@@ -96,3 +136,16 @@ class Storage {
 }
 
 export const storage = new Storage();
+
+export const handleS3Error = <Type>(func: () => Promise<Type>) => {
+  return async () => {
+    try {
+      return await func();
+    } catch (e: unknown) {
+      if (e instanceof S3ServiceException) {
+        if (e.$response?.statusCode === 404) throw notFound();
+      }
+      throw e;
+    }
+  };
+};

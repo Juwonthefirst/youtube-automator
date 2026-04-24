@@ -158,7 +158,7 @@ export const createUploadFunction =
     setErrorMessage: Dispatch<SetStateAction<string>>,
   ) =>
   async (file: File, settings: Record<string, string>) => {
-    const Key = "pending/" + file.name;
+    const Key = "unprocessed/" + file.name;
     const parts = Math.ceil(file.size / FileUploader.chunkSize);
     try {
       const UploadId = await FileUploader.fetchUploadId(

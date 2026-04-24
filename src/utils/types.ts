@@ -2,8 +2,13 @@ export interface StorageFileInfo {
   name: string;
   Key: string;
   size: number;
-  isFolder: boolean;
+  thumbnailURL: string;
   created_at: string;
+}
+
+export interface StorageFolderInfo {
+  name: string;
+  Key: string;
 }
 
 export interface UploadedPart {
