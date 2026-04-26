@@ -1,41 +1,24 @@
 "use client";
 
+import AddClipForm from "@/components/clip/add-clip-form";
+import Clip from "@/components/clip/clip";
+import FileInputField from "@/components/file-input-field";
 import { UploadControlsContext } from "@/components/file-upload-controller";
 import FileUploadInput from "@/components/file-upload-input";
 import Input from "@/components/input";
-import { parseDateString } from "@/utils/helper";
-import { LoaderCircle, UploadCloud } from "lucide-react";
-import { use, useMemo, useState } from "react";
+import { UploadMetadata } from "@/utils/types";
+import { Film, LoaderCircle } from "lucide-react";
+import { use, useState } from "react";
 
-const FileInputField = ({ selectedFile }: { selectedFile: File | null }) => {
-  const selectedFileUrl = useMemo(
-    () => (selectedFile ? URL.createObjectURL(selectedFile) : ""),
-    [selectedFile],
-  );
-  return (
-    <div className="flex justify-center items-center w-full h-full bg-black/5 dark:bg-white/5 text-black dark:text-white text-sm p-4 border-dashed border-3 dark:border-white rounded-xl">
-      {selectedFile ? (
-        <video
-          src={selectedFileUrl}
-          className="w-9/10 h-9/10 object-cover"
-          playsInline
-          controls
-        />
-      ) : (
-        <div className="flex flex-col gap-2 items-center justify-center">
-          <UploadCloud className="size-12" />
-          <p>Select or drop file here</p>
-        </div>
-      )}
-    </div>
-  );
-};
 const Page = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [filename, setFilename] = useState("");
-  const [noOfClips, setNoOfClips] = useState("");
+  const [metadata, setMetadata] = useState<UploadMetadata>({
+    clipName: "",
+    clips: [],
+  });
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showClipForm, setShowClipForm] = useState(false);
   const uploadControls = use(UploadControlsContext);
 
   return (
@@ -45,86 +28,93 @@ const Page = () => {
         if (!selectedFile) return setErrorMessage("Select a File to upload");
         setIsLoading(true);
         setErrorMessage("");
-        const settings: Record<string, string> = {};
-        if (filename) settings["filename"] = filename;
-        if (noOfClips) settings["noOfClips"] = noOfClips;
-        await uploadControls?.upload(selectedFile, settings);
+        if (!metadata.clipName)
+          return setErrorMessage("Enter Clip project name");
+        await uploadControls?.upload(selectedFile, metadata);
         setSelectedFile(null);
-        setFilename("");
-        setNoOfClips("");
         setIsLoading(false);
       }}
-      className="flex-col lg:flex-row flex gap-16"
+      className="flex-col flex gap-8 p-4"
     >
-      <section className="flex flex-col gap-6 flex-1">
+      <Input
+        id="clipName-input"
+        value={metadata.clipName}
+        setValue={(value) => setMetadata({ ...metadata, clipName: value })}
+        label="Clip project name"
+        placeholder="Enter name to use as file name"
+      />
+      <section className="">
+        <h2 className="text-lg font-medium mb-3">Select video to clip</h2>
         <FileUploadInput
-          className="max-w-xl w-full h-64 self-center"
+          className="lg:w-xl w-full h-64 self-center"
           accept="video/*"
           maxFiles={1}
           onUpload={(files) => {
             if ((files && !files[0].type.startsWith("video/")) || !files)
               return;
             setSelectedFile(files[0]);
+            setMetadata({ ...metadata, clips: [] });
           }}
           labelChildren={<FileInputField selectedFile={selectedFile} />}
         />
-
-        {selectedFile && (
-          <section className="bg-black/10 dark:bg-white/10 rounded-xl p-4 max-w-xl w-full self-center">
-            <h1 className="font-medium mb-2 text-lg">File information</h1>
-
-            <ul className="text-sm list-inside list-disc space-y-1">
-              <li>
-                <b>Name:</b> {selectedFile.name}
-              </li>
-              <li>
-                <b>Size: </b>
-                {(selectedFile.size / (1024 * 1024)).toFixed(2) + "MB"}
-              </li>
-              <li>
-                <b>Content type:</b> {selectedFile.type}
-              </li>
-              <li>
-                <b>Last modidied:</b>{" "}
-                {parseDateString({
-                  dateString: new Date(selectedFile.lastModified).toISOString(),
-                })}
-              </li>
-            </ul>
-          </section>
-        )}
       </section>
-      <section className="flex-1 overflow-y-auto flex flex-col gap-4">
-        <Input
-          id="filename-input"
-          value={filename}
-          setValue={setFilename}
-          label="File name"
-          placeholder="Enter name to use as file name"
-        />
-        <Input
+      {selectedFile && (
+        <section className="mt-3 flex flex-col gap-4">
+          <h2 className="text-lg font-medium">Clips</h2>
+          <ul className="space-y-4">
+            {metadata.clips.map((clip) => (
+              <li key={clip.uuid}>
+                <Clip
+                  {...clip}
+                  onRemove={() =>
+                    setMetadata({
+                      ...metadata,
+                      clips: metadata.clips.filter(
+                        (metadataClip) => clip.uuid !== metadataClip.uuid,
+                      ),
+                    })
+                  }
+                />
+              </li>
+            ))}
+          </ul>
+          {showClipForm && (
+            <AddClipForm
+              setClips={(clip) =>
+                setMetadata({ ...metadata, clips: [...metadata.clips, clip] })
+              }
+              closeForm={() => setShowClipForm(false)}
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => setShowClipForm(!showClipForm)}
+            className="flex gap-2 bg-black text-white dark:text-black items-center dark:bg-white font-medium text-sm rounded-md py-1.5 px-3 hover:ring-4 ring-black/10 dark:ring-white/20 w-fit"
+          >
+            <Film size={18} /> {showClipForm ? "Cancel" : "Add clip"}
+          </button>
+        </section>
+      )}
+      {/* <Input
           id="clipnumber-input"
           type="number"
           label="Number of clips"
           value={noOfClips}
           setValue={setNoOfClips}
           placeholder="How many clips should created"
-        />
-        <p className="text-red-500 mt-auto text-sm text-center">
-          {errorMessage}
-        </p>
-        <button
-          disabled={isLoading}
-          className=" flex justify-center items-center bg-black text-white dark:bg-white dark:text-black w-full p-2 text-lg font-medium rounded-lg disabled:opacity-80 active:scale-97 transition-all duration-100"
-          type="submit"
-        >
-          {isLoading ? (
-            <LoaderCircle className="animate-spin size-6" />
-          ) : (
-            "Upload"
-          )}
-        </button>
-      </section>
+        /> */}
+      <p className="text-red-500 mt-auto text-sm text-center">{errorMessage}</p>
+      <button
+        disabled={isLoading}
+        className=" flex justify-center items-center bg-black text-white dark:bg-white dark:text-black w-full p-2 text-lg font-medium rounded-lg disabled:opacity-80 active:scale-97 transition-all duration-100"
+        type="submit"
+      >
+        {isLoading ? (
+          <LoaderCircle className="animate-spin size-6" />
+        ) : (
+          "Upload"
+        )}
+      </button>
     </form>
   );
 };

@@ -10,7 +10,7 @@ import {
   UploadPartCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { StorageFolderInfo, UploadedPart } from "./types";
+import { StorageFolderInfo, UploadedPart, UploadMetadata } from "./types";
 import path from "path";
 import { notFound } from "next/navigation";
 
@@ -73,14 +73,14 @@ class Storage {
   async getUploadId(
     Key: string,
     ContentType: string,
-    Metadata: Record<string, string>,
+    Metadata: UploadMetadata,
   ) {
     const response = await this.s3.send(
       new CreateMultipartUploadCommand({
         Bucket: this.bucket,
         Key,
         ContentType,
-        Metadata,
+        Metadata: { processor_settings: JSON.stringify(Metadata) },
       }),
     );
 

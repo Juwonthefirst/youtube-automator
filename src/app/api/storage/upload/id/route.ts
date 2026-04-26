@@ -1,9 +1,10 @@
 import { storage } from "@/utils/storage";
+import { UploadMetadata } from "@/utils/types";
 import { NextResponse } from "next/server";
 
 export interface RequestData {
   Key: string;
-  Metadata: Record<string, string>;
+  Metadata: UploadMetadata;
   contentType: string;
 }
 

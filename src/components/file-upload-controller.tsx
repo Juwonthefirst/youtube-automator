@@ -1,13 +1,13 @@
 "use client";
 
 import { createUploadFunction, FileUploader } from "@/utils/file-uploader";
-import { ActiveFileUpload } from "@/utils/types";
+import { ActiveFileUpload, UploadMetadata } from "@/utils/types";
 import { useState, createContext, useMemo } from "react";
 import InfoPopup from "./info-popup";
 
 interface UploadControls {
   hasActiveUploads: boolean;
-  upload: (file: File, settings: Record<string, string>) => Promise<void>;
+  upload: (file: File, metadata: UploadMetadata) => Promise<void>;
   continueUpload: (UploadId: string) => void;
   cancelUpload: (UploadId: string) => Promise<void>;
 }

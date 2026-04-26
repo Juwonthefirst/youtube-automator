@@ -25,3 +25,13 @@ export interface ActiveFileUpload {
   errorMessage: string;
   isUploading: boolean;
 }
+export interface Clip {
+  start: string;
+  end: string;
+  title: string;
+  uuid: string;
+}
+export interface UploadMetadata {
+  clipName: string;
+  clips: Clip[];
+}

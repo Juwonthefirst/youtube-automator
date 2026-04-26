@@ -1,4 +1,5 @@
 import json, os, boto3
+import subprocess
 from faster_whisper import WhisperModel
 from openai import OpenAI
 
@@ -92,8 +93,27 @@ def lambda_handler(event, context):
     Key = ""
     bucket_name = ""
     input_file_path = f"/tmp/{Key}"
+    output_file_path = f"/tmp/output/{Key}"
+    ass_file_path = f"/tmp/{Key}/subtitles.ass"
     try:
         s3.download_file(Bucket=bucket_name, Key=Key, Filename=input_file_path)
-
+        transcript = transcribe(input_file_path)
+        styled_transcript = style_subtitles(transcript)
+        generate_ass(styled_transcript, ass_file_path)
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-i",
+                input_file_path,
+                "-vf",
+                f"ass={ass_file_path}",
+                output_file_path,
+            ]
+        )
+        s3.upload_file(Bucket=bucket_name, Key=Key, Filename=output_file_path)
     except Exception as err:
         pass
+
+    os.remove(input_file_path)
+    os.remove(ass_file_path)
+    os.remove(output_file_path)

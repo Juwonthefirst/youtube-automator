@@ -8,7 +8,7 @@ import {
   RequestData as StorageUploadPartRequest,
   ResponseData as StorageUploadPartResponse,
 } from "@/app/api/storage/upload/part/route";
-import { ActiveFileUpload, UploadedPart } from "./types";
+import { ActiveFileUpload, UploadedPart, UploadMetadata } from "./types";
 import { RequestData as StorageUploadCompleteRequest } from "@/app/api/storage/upload/complete/route";
 import { RequestData as StorageUploadCancelRequest } from "@/app/api/storage/upload/cancel/route";
 import { Dispatch, SetStateAction } from "react";
@@ -18,7 +18,7 @@ export class FileUploader {
   static async fetchUploadId(
     filename: string,
     contentType: string,
-    Metadata: Record<string, string>,
+    Metadata: UploadMetadata,
   ) {
     const payload: StorageUploadIdRequest = {
       Key: filename,
@@ -157,14 +157,14 @@ export const createUploadFunction =
     setActiveUploads: Dispatch<SetStateAction<ActiveFileUpload[]>>,
     setErrorMessage: Dispatch<SetStateAction<string>>,
   ) =>
-  async (file: File, settings: Record<string, string>) => {
+  async (file: File, metadata: UploadMetadata) => {
     const Key = "unprocessed/" + file.name;
     const parts = Math.ceil(file.size / FileUploader.chunkSize);
     try {
       const UploadId = await FileUploader.fetchUploadId(
         Key,
         file.type,
-        settings,
+        metadata,
       );
       const activeUploadState: ActiveFileUpload = {
         file,

@@ -35,7 +35,7 @@ async def download_and_upload_thumbnail(s3, key: str, bucket: str):
 async def lambda_handler(event, context):
     aws_session = Session()
     file_processes = []
-    with aws_session.client("s3") as s3:
+    async with aws_session.client("s3") as s3:
         for event_record in event["Record"]:
             bucket_name: str = event_record["s3"]["bucket"]["name"]
             Key = unquote_plus(event_record["s3"]["object"]["key"])

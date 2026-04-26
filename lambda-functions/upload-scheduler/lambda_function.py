@@ -21,7 +21,7 @@ async def create_upload_schedule(scheduler, Key: str, bucket_name: str, index: i
 
 async def lambda_handler(event, context):
     aws_session = Session()
-    file_processes = []
+    schedule_requests = []
     bucket_name: str = event["bucket"]
     parent_key: str = event["parent_key"]
     if not parent_key.endswith("/"):
@@ -32,9 +32,9 @@ async def lambda_handler(event, context):
         )
     async with aws_session.client("scheduler") as scheduler:
         for index, file_key in enumerate(files.get("Content", [])):
-            file_processes.append(
+            schedule_requests.append(
                 create_upload_schedule(scheduler, file_key, bucket_name, index)
             )
-    await asyncio.gather(*file_processes)
+    await asyncio.gather(*schedule_requests)
 
     return {"status": 200}
