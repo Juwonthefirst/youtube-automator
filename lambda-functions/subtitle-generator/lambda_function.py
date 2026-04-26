@@ -21,6 +21,7 @@ def transcribe(file_path: str):
 
 
 def style_subtitles(transcript_segments):
+    # TODO: replace openai with gemini
     prompt = f"""
 You are a subtitle styling AI for viral boondocks Shorts.
 

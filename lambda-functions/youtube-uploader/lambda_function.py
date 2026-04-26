@@ -2,6 +2,7 @@ import os
 import boto3
 from google.oauth.credentials import Credentials
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 
 creds = Credentials(
     token=None,
@@ -14,10 +15,15 @@ creds = Credentials(
 
 def upload_to_youtube(file_path: str):
     youtube = build("youtube", "v3", credentials=creds)
+    # TODO: use google's gemini to generate title and description
     request = youtube.videos().insert(
         part="snippet,status",
-        body={"snippet": {}, "status": {"privacyStatus": "public"}},
+        body={"snippet": {"categoryId": "1"}, "status": {"privacyStatus": "public"}},
+        media_body=MediaFileUpload(file_path, chunksize=-1, resumable=True),
     )
+    response = request.execute()
+
+    return response["id"]
 
 
 s3 = boto3.client("s3")

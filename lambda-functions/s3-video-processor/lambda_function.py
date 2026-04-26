@@ -12,7 +12,7 @@ title_embedding = []
 flip = []
 zoom = []
 speed_up = []
-clip = lambda x: ["-ss", x["start"], "-es", x["end"]]
+clip = lambda x: ["-ss", x["start"], "-es", x["end"]] if clip else []
 
 
 async def ffmpeg_processing_and_upload(
