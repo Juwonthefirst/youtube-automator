@@ -1,12 +1,21 @@
 import asyncio
 from datetime import datetime, timedelta
 import json
+from random import random
 from aioboto3 import Session
 
 
 async def create_upload_schedule(scheduler, Key: str, bucket_name: str, index: int):
-    upload_delay_in_hours = 12
-    trigger_time = datetime.now() + timedelta(hours=index * upload_delay_in_hours)
+    # random acts noise to create inconsistent upload time
+    upload_delay_in_hours = round(12 + (6 * random()))
+    upload_delay_in_minutes = round(60 * random())
+    upload_delay_in_seconds = round(60 * random())
+    trigger_time = datetime.now() + timedelta(
+        hours=index * upload_delay_in_hours,
+        minutes=upload_delay_in_minutes if index >= 1 else 0,
+        seconds=upload_delay_in_seconds if index >= 1 else 0,
+    )
+    # TODO: Add target fuction role arn and arn
     await scheduler.create_schedule(
         Name=f"{Key} Youtube upload schedule",
         ScheduleExpression=f"at({trigger_time.isoformat()})",
