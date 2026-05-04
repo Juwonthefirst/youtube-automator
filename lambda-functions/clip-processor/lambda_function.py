@@ -1,9 +1,10 @@
-import asyncio
 import json
 import os
 import subprocess
-
 import boto3
+
+s3 = boto3.client("s3")
+sqs_queue = boto3.client("sqs")
 
 
 title_embedding = (
@@ -15,7 +16,7 @@ speed_up = []
 clip = lambda x: ["-ss", x["start"], "-to", x["end"]] if clip else []
 
 
-def process_clip(s3, sqs_queue, Key: str, Bucket: str, metadata: dict):
+def process_clip(Key: str, Bucket: str, metadata: dict):
     input_file_path = f"/tmp/{Bucket}/{Key}"
     output_file_path = f"/tmp/output/{Key}"
 
@@ -47,16 +48,12 @@ def process_clip(s3, sqs_queue, Key: str, Bucket: str, metadata: dict):
     os.remove(input_file_path)
 
 
-s3 = boto3.client("s3")
-sqs_queue = boto3.client("sqs")
-
-
-async def lambda_landler(event, context):
+def lambda_handler(event, context):
     for event_record in event["Record"]:
         data = json.loads(event_record["body"])
         bucket_name: str = data["bucket_name"]
         Key = data["key"]
         metadata = data.get("metadata", {})
-        process_clip(s3, sqs_queue, Key, bucket_name, metadata)
+        process_clip(Key, bucket_name, metadata)
 
     return {"status": 200}
