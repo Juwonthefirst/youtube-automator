@@ -4,7 +4,13 @@ import os
 from random import randint
 import boto3
 
-s3 = boto3.client("s3")
+s3 = boto3.client(
+    "s3",
+    endpoint_url=os.getenv("S3_ENDPOINT_URL"),
+    aws_access_key_id=os.getenv("S3_ACCESS_KEY"),
+    aws_secret_access_key=os.getenv("S3_SECRET_KEY"),
+    region_name="auto",
+)
 scheduler = boto3.client("scheduler")
 
 upload_hours = [14, 18, 21]
@@ -42,8 +48,17 @@ def create_upload_schedule(Key: str, bucket_name: str, index: int):
 
 
 def lambda_handler(event, context):
-    bucket_name: str = event["bucket"]
-    parent_key: str = event["parent_key"]
+    try:
+        data = json.loads(event["body"])
+        bucket_name: str = data["bucket"]
+        parent_key: str = data["parent_key"]
+    except json.JSONDecodeError:
+        return {"statusCode": 400, "body": "Invalid JSON in request body"}
+    except KeyError:
+        return {
+            "statusCode": 400,
+            "body": "Missing required fields: 'bucket' and 'parent_key'",
+        }
     if not parent_key.endswith("/"):
         parent_key += "/"
     files = s3.list_objects_v2(Bucket=bucket_name, Prefix=parent_key, Delimiter="/")
@@ -51,4 +66,4 @@ def lambda_handler(event, context):
     for index, file_key in enumerate(files.get("Content", [])):
         create_upload_schedule(scheduler, file_key, bucket_name, index + index_shift)
 
-    return {"status": 200}
+    return {"statusCode": 200, "body": "Upload schedules created successfully"}

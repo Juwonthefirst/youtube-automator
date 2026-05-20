@@ -1,6 +1,6 @@
 import os
 import boto3
-from google.oauth.credentials import Credentials
+from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
@@ -26,7 +26,13 @@ def upload_to_youtube(file_path: str):
     return response["id"]
 
 
-s3 = boto3.client("s3")
+s3 = boto3.client(
+    "s3",
+    endpoint_url=os.getenv("S3_ENDPOINT_URL"),
+    aws_access_key_id=os.getenv("S3_ACCESS_KEY"),
+    aws_secret_access_key=os.getenv("S3_SECRET_KEY"),
+    region_name="auto",
+)
 
 
 def lambda_handler(event, context):
@@ -42,4 +48,4 @@ def lambda_handler(event, context):
 
     os.remove(input_file_path)
 
-    return {"status": 200}
+    return {"statusCode": 200}
