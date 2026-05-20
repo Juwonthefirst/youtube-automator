@@ -13,12 +13,14 @@ creds = Credentials(
 )
 
 
-def upload_to_youtube(file_path: str):
+def upload_to_youtube(file_path: str, title: str, description: str):
     youtube = build("youtube", "v3", credentials=creds)
-    # TODO: use google's gemini to generate title and description
     request = youtube.videos().insert(
         part="snippet,status",
-        body={"snippet": {"categoryId": "1"}, "status": {"privacyStatus": "public"}},
+        body={
+            "snippet": {"categoryId": "1", "title": title, "description": description},
+            "status": {"privacyStatus": "public"},
+        },
         media_body=MediaFileUpload(file_path, chunksize=-1, resumable=True),
     )
     response = request.execute()
@@ -40,8 +42,12 @@ def lambda_handler(event, context):
     Key = event["key"]
     input_file_path = f"/tmp/{Key}"
     try:
+        response = s3.head_object(Bucket=bucket_name, Key=Key)
+        metadata: dict = response["Metadata"]
         s3.download_file(Bucket=bucket_name, Key=Key, Filename=input_file_path)
-        upload_to_youtube(input_file_path)
+        upload_to_youtube(
+            input_file_path, metadata.get("title", ""), metadata.get("description", "")
+        )
         s3.delete_object(Bucket=bucket_name, Key=Key)
     except Exception as err:
         pass
