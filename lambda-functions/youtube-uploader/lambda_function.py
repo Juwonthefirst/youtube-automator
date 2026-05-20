@@ -30,7 +30,6 @@ s3 = boto3.client("s3")
 
 
 def lambda_handler(event, context):
-
     bucket_name: str = event["bucket"]
     Key = event["key"]
     input_file_path = f"/tmp/{Key}"

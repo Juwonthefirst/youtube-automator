@@ -9,19 +9,13 @@ scheduler = boto3.client("scheduler")
 
 
 def create_upload_schedule(Key: str, bucket_name: str, index: int):
-    # random acts noise to create inconsistent upload time
-    upload_delay_in_hours = round(12 + (6 * random()))
-    upload_delay_in_minutes = round(60 * random())
-    upload_delay_in_seconds = round(60 * random())
-    trigger_time = datetime.now() + timedelta(
-        hours=index * upload_delay_in_hours,
-        minutes=upload_delay_in_minutes if index >= 1 else 0,
-        seconds=upload_delay_in_seconds if index >= 1 else 0,
-    )
+    upload_hours = [7, 13, 20]
+    upload_dates = [timedelta(hours=7, minutes=random() * 60)]
     scheduler.create_schedule(
         Name=f"{Key} Youtube upload schedule",
-        ScheduleExpression=f"at({trigger_time.isoformat()})",
+        # ScheduleExpression=f"at({trigger_time.isoformat()})",
         FlexibleTimeWindow={"Mode": "OFF"},
+        ActionAfterCompletion="DELETE",
         Target={
             "Arn": os.getenv("TARGET_ARN"),
             "Input": json.dumps({"bucket": bucket_name, "key": Key}),

@@ -41,3 +41,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+lambda-functions/youtube-uploader/*
+!lambda-functions/youtube-uploader/lambda_function.py

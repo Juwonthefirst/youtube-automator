@@ -1,24 +1,32 @@
-import {
-  AbortMultipartUploadCommand,
-  CompleteMultipartUploadCommand,
-  CreateMultipartUploadCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-  ListObjectsV2Command,
-  S3Client,
-  S3ServiceException,
-  UploadPartCommand,
-} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { StorageFolderInfo, UploadedPart, UploadMetadata } from "./types";
 import path from "path";
 import { notFound } from "next/navigation";
+import {
+  S3Client,
+  ListObjectsV2Command,
+  GetObjectCommand,
+  CreateMultipartUploadCommand,
+  UploadPartCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
+  DeleteObjectCommand,
+  S3ServiceException,
+} from "@aws-sdk/client-s3";
 
 class Storage {
   private readonly s3: S3Client;
   readonly bucket: string;
   constructor() {
-    this.s3 = new S3Client({ region: "eu-central-1" });
+    this.s3 = new S3Client({
+      region: "auto",
+      endpoint: process.env.S3_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      },
+      forcePathStyle: true,
+    });
     this.bucket = process.env.BUCKET_NAME!;
   }
 
