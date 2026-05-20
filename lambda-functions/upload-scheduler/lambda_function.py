@@ -1,19 +1,36 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import os
-from random import random
+from random import randint
 import boto3
 
 s3 = boto3.client("s3")
 scheduler = boto3.client("scheduler")
 
+upload_hours = [14, 18, 21]
+
+
+def get_upload_hour_index_shift(current_hour: int):
+    starting_index = 0
+    while (
+        starting_index < len(upload_hours)
+        and current_hour >= upload_hours[starting_index]
+    ):
+        starting_index += 1
+    return starting_index
+
 
 def create_upload_schedule(Key: str, bucket_name: str, index: int):
-    upload_hours = [7, 13, 20]
-    upload_dates = [timedelta(hours=7, minutes=random() * 60)]
+    trigger_hour_index = index % len(upload_hours)
+    trigger_time = datetime.now(timezone.utc).replace(
+        hour=upload_hours[trigger_hour_index],
+        minute=randint(0, 10),
+        second=randint(0, 30),
+    ) + timedelta(days=index // len(upload_hours))
+
     scheduler.create_schedule(
-        Name=f"{Key} Youtube upload schedule",
-        # ScheduleExpression=f"at({trigger_time.isoformat()})",
+        Name=f"{Key} upload schedule",
+        ScheduleExpression=f"at({trigger_time.isoformat().replace("+00:00", "Z")})",
         FlexibleTimeWindow={"Mode": "OFF"},
         ActionAfterCompletion="DELETE",
         Target={
@@ -30,7 +47,8 @@ def lambda_handler(event, context):
     if not parent_key.endswith("/"):
         parent_key += "/"
     files = s3.list_objects_v2(Bucket=bucket_name, Prefix=parent_key, Delimiter="/")
+    index_shift = get_upload_hour_index_shift(datetime.now(timezone.utc).hour)
     for index, file_key in enumerate(files.get("Content", [])):
-        create_upload_schedule(scheduler, file_key, bucket_name, index)
+        create_upload_schedule(scheduler, file_key, bucket_name, index + index_shift)
 
     return {"status": 200}
