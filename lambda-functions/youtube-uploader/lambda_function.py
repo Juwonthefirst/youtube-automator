@@ -54,7 +54,7 @@ def lambda_handler(event, context):
         )
         s3.delete_object(Bucket=bucket_name, Key=Key)
     except Exception as err:
-        pass
+        raise err
 
     os.remove(input_file_path)
 
