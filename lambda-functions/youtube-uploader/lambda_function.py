@@ -38,8 +38,12 @@ s3 = boto3.client(
 
 
 def lambda_handler(event, context):
-    bucket_name: str = event["bucket"]
-    Key = event["key"]
+    try:
+        detail = event.get("detail", {})
+        bucket_name: str = detail["bucket"]
+        Key = detail["key"]
+    except KeyError:
+        return {"statusCode": 400, "message": "Invalid Event"}
     input_file_path = f"/tmp/{Key}"
     try:
         response = s3.head_object(Bucket=bucket_name, Key=Key)
