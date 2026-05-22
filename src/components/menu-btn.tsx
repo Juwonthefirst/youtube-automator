@@ -18,7 +18,10 @@ const MenuBtn = (props: Props) => {
       <button
         type="button"
         className="-col-start-2 justify-self-end p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/20 transition-all"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={(event) => {
+          event.stopPropagation();
+          setIsOpen(!isOpen);
+        }}
       >
         <EllipsisVertical className="size-5" />
       </button>

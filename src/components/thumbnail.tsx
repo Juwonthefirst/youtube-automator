@@ -6,7 +6,7 @@ import { useState } from "react";
 
 const Thumbnail = (props: ImageProps) => {
   const [isFailed, setIsFailed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   return isFailed || isLoading ? (
     <Video size={32} className="shrink-0" />
   ) : (
