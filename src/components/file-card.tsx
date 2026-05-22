@@ -14,7 +14,7 @@ const FileCard = (props: StorageFileInfo) => {
         height={40}
         className="size-10 rounded-md object-cover shadow-md"
       />
-      <div className="flex flex-1 flex-col gap-1 w-4/5">
+      <div className="flex flex-col gap-1 w-3/4">
         <p className="line-clamp-1 font-medium whitespace-nowrap text-ellipsis">
           {props.name}
         </p>
