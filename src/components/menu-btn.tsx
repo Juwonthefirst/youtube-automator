@@ -5,6 +5,7 @@ import { useState } from "react";
 import { api } from "@/utils/api-client";
 import MutationBtn from "./mutation-btn";
 import { delay } from "@/utils/helper";
+import { useRouter } from "next/navigation";
 
 interface Props {
   Key: string;
@@ -12,6 +13,7 @@ interface Props {
 
 const MenuBtn = (props: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <div className="relative">
@@ -31,9 +33,10 @@ const MenuBtn = (props: Props) => {
           className="absolute -left-10 text-sm whitespace-nowrap flex flex-col gap-1 z-10 bg-white dark:text-white dark:bg-black border-black/20 dark:border-white/20 border-[1.5px] rounded-xl p-1.5 shadow-lg "
         >
           <MutationBtn
-            mutationFn={() =>
-              api.delete<void>("/api/storage/files/" + props.Key)
-            }
+            mutationFn={async () => {
+              await api.delete<void>("/api/storage/files/" + props.Key);
+              router.refresh();
+            }}
             className="text-red-400  hover:bg-red-500/40 rounded-md px-2 py-1"
             confirmationText="Are you sure you want to delete this file"
           >
