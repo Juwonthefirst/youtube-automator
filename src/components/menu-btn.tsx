@@ -4,7 +4,6 @@ import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 import { api } from "@/utils/api-client";
 import MutationBtn from "./mutation-btn";
-import { delay } from "@/utils/helper";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -45,10 +44,12 @@ const MenuBtn = (props: Props) => {
           <MutationBtn
             className="hover:bg-black/15 dark:hover:bg-white/15 rounded-md px-2 py-1"
             mutationFn={async () => {
-              await delay(3000);
-              alert("juwon");
+              await api.post<void>(process.env.NEXT_PUBLIC_LAMBDA_URL!, {
+                parent_key: props.Key,
+                bucket: process.env.NEXT_PUBLIC_S3_BUCKET!,
+              });
             }}
-            confirmationText={`You are uploading ${props.Key} to YouTube`}
+            confirmationText={`You are uploading this file to YouTube`}
           >
             Upload
           </MutationBtn>
