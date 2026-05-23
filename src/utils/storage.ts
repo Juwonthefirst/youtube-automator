@@ -27,7 +27,7 @@ class Storage {
       },
       forcePathStyle: true,
     });
-    this.bucket = process.env.NEXT_PUBLIC_S3_BUCKET!;
+    this.bucket = process.env.BUCKET_NAME!;
   }
 
   async listChildren(parentKey?: string) {

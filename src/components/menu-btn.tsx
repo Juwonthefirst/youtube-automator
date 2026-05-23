@@ -44,9 +44,8 @@ const MenuBtn = (props: Props) => {
           <MutationBtn
             className="hover:bg-black/15 dark:hover:bg-white/15 rounded-md px-2 py-1"
             mutationFn={async () => {
-              await api.post<void>(process.env.NEXT_PUBLIC_LAMBDA_URL!, {
+              await api.post<void>("/api/lambda", {
                 parent_key: props.Key,
-                bucket: process.env.NEXT_PUBLIC_S3_BUCKET!,
               });
             }}
             confirmationText={`You are uploading this file to YouTube`}
