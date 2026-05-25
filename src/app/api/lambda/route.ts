@@ -26,7 +26,7 @@ export const POST = async (req: Request) => {
   if (response.FunctionError) {
     return NextResponse.json({
       status: "error",
-      statusCode: response.StatusCode,
+      statusCode: result?.statusCode || 500,
       error: result,
     });
   }
