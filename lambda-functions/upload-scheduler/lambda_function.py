@@ -13,7 +13,7 @@ s3 = boto3.client(
 )
 scheduler = boto3.client("scheduler")
 
-upload_hours = [14, 18, 21]
+upload_hours = [21]
 
 
 def get_upload_hour_index_shift(current_hour: int):
@@ -49,11 +49,8 @@ def create_upload_schedule(Key: str, bucket_name: str, index: int):
 
 def lambda_handler(event, context):
     try:
-        data = json.loads(event["body"])
-        bucket_name: str = data["bucket"]
-        parent_key: str = data["parent_key"]
-    except json.JSONDecodeError:
-        return {"statusCode": 400, "body": "Invalid JSON in request body"}
+        bucket_name: str = event["bucket"]
+        parent_key: str = event["parent_key"]
     except KeyError:
         return {
             "statusCode": 400,

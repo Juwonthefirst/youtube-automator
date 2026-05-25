@@ -11,6 +11,7 @@ export const POST = async (req: Request) => {
     region: process.env.AWS_REGION,
   });
   const payload = {
+    bucket: process.env.BUCKET_NAME,
     parent_key: data.parent_key,
   };
   const response = await client.send(
