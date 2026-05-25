@@ -26,7 +26,7 @@ def get_upload_hour_index_shift(current_hour: int):
     return starting_index
 
 
-def create_upload_schedule(Key: str, bucket_name: str, index: int):
+def create_upload_schedule(group_name: str, Key: str, bucket_name: str, index: int):
     trigger_hour_index = index % len(upload_hours)
     trigger_time = datetime.now(timezone.utc).replace(
         hour=upload_hours[trigger_hour_index],
@@ -37,6 +37,7 @@ def create_upload_schedule(Key: str, bucket_name: str, index: int):
 
     scheduler.create_schedule(
         Name=(Key.replace("/", "-").replace(".", "-") + "-")[:64],
+        GroupName=group_name,
         ScheduleExpression=f"at({trigger_time.strftime('%Y-%m-%dT%H:%M:%S')})",
         FlexibleTimeWindow={"Mode": "OFF"},
         ActionAfterCompletion="DELETE",
@@ -61,7 +62,16 @@ def lambda_handler(event, context):
         parent_key += "/"
     files = s3.list_objects_v2(Bucket=bucket_name, Prefix=parent_key, Delimiter="/")
     index_shift = get_upload_hour_index_shift(datetime.now(timezone.utc).hour)
-    for index, file in enumerate(files.get("Contents", [])):
-        create_upload_schedule(file["Key"], bucket_name, index + index_shift)
+    files = files.get("Contents", [])
+    scheduler_group_name = parent_key.strip("/").replace("/", "-")[:64]
+    if files:
+        try:
+            scheduler.create_schedule_group(Name=scheduler_group_name)
+        except scheduler.exceptions.ConflictException:
+            pass
+    for index, file in enumerate(files):
+        create_upload_schedule(
+            scheduler_group_name, file["Key"], bucket_name, index + index_shift
+        )
 
     return {"statusCode": 200, "body": "Upload schedules created successfully"}
