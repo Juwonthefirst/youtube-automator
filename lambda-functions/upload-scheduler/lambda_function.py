@@ -32,11 +32,12 @@ def create_upload_schedule(Key: str, bucket_name: str, index: int):
         hour=upload_hours[trigger_hour_index],
         minute=randint(0, 10),
         second=randint(0, 30),
+        microsecond=0,
     ) + timedelta(days=index // len(upload_hours))
 
     scheduler.create_schedule(
         Name=(Key.replace("/", "-").replace(".", "-") + "-")[:64],
-        ScheduleExpression=f"at({trigger_time.isoformat().replace("+00:00", "Z")})",
+        ScheduleExpression=f"at({trigger_time.strftime('%Y-%m-%dT%H:%M:%S')})",
         FlexibleTimeWindow={"Mode": "OFF"},
         ActionAfterCompletion="DELETE",
         Target={
