@@ -36,7 +36,7 @@ def create_upload_schedule(group_name: str, Key: str, bucket_name: str, index: i
     ) + timedelta(days=index // len(upload_hours))
 
     scheduler.create_schedule(
-        Name=(Key.replace("/", "-").replace(".", "-") + "-")[:64],
+        Name=f"{Key.split("/")[-1]}",
         GroupName=group_name,
         ScheduleExpression=f"at({trigger_time.strftime('%Y-%m-%dT%H:%M:%S')})",
         FlexibleTimeWindow={"Mode": "OFF"},
