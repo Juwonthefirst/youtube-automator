@@ -61,6 +61,6 @@ def lambda_handler(event, context):
     files = s3.list_objects_v2(Bucket=bucket_name, Prefix=parent_key, Delimiter="/")
     index_shift = get_upload_hour_index_shift(datetime.now(timezone.utc).hour)
     for index, file_key in enumerate(files.get("Content", [])):
-        create_upload_schedule(scheduler, file_key, bucket_name, index + index_shift)
+        create_upload_schedule(file_key, bucket_name, index + index_shift)
 
     return {"statusCode": 200, "body": "Upload schedules created successfully"}

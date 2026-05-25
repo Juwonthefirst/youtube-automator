@@ -20,6 +20,16 @@ export const POST = async (req: Request) => {
       Payload: JSON.stringify(payload),
     }),
   );
+
+  const result = JSON.parse(new TextDecoder().decode(response.Payload));
+  console.log("Lambda response:", result);
+  if (response.FunctionError) {
+    return NextResponse.json({
+      status: "error",
+      statusCode: response.StatusCode,
+      error: result,
+    });
+  }
   return NextResponse.json({
     status: "success",
     statusCode: response.StatusCode,
