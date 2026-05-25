@@ -1,18 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import FileUploadContext from "@/components/file-upload-controller";
-
-const poppins = Poppins({
-  weight: ["400", "500", "700"],
-});
-
-export const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  weight: ["700"],
-});
+import { poppins } from "@/utils/fonts";
 
 export const metadata: Metadata = {
   title: "Automator",

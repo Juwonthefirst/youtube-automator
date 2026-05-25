@@ -1,4 +1,4 @@
-import { geistSans } from "@/app/layout";
+import { geistSans } from "@/utils/fonts";
 import { Upload, UploadCloud } from "lucide-react";
 import Link from "next/link";
 
