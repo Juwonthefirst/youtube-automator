@@ -1,6 +1,9 @@
+"use client";
+
 import { X } from "lucide-react";
-import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface FilePreviewModalProps {
   name: string;
@@ -19,34 +22,59 @@ const getFileType = (fileName: string): "video" | "image" | "unknown" => {
   return "unknown";
 };
 
-export default async function FilePreviewModal({
+export default function FilePreviewModal({
   name,
   fileURL,
-  currentPath,
 }: FilePreviewModalProps) {
   const fileType = getFileType(name);
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        router.back();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [router]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      router.back();
+    }
+  };
+
+  const handleClose = () => {
+    router.back();
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50">
-      <div className="bg-white dark:bg-neutral-900 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between border-b border-black/20 dark:border-white/20 px-6 py-4">
+    <div
+      className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white dark:bg-neutral-900 rounded-2xl w-[95vw] h-[95vh] flex flex-col">
+        <div className="flex items-center justify-between border-b border-black/20 dark:border-white/20 px-6 py-4 shrink-0">
           <div className="flex-1 min-w-0">
             <h2 className="font-medium text-lg truncate">{name}</h2>
           </div>
-          <Link
-            href={`/files/${currentPath.join("/")}`}
+          <button
+            onClick={handleClose}
             className="ml-4 p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-lg transition-colors shrink-0"
+            aria-label="Close modal"
           >
             <X size={24} />
-          </Link>
+          </button>
         </div>
 
-        <div className="flex-1 flex items-center justify-center overflow-hidden p-6 bg-black/5 dark:bg-white/5">
+        <div className="flex-1 flex items-center justify-center overflow-hidden bg-black/5 dark:bg-white/5">
           {fileType === "video" && (
             <video
               src={fileURL}
               controls
-              className="max-w-full max-h-full rounded-lg"
+              className="max-w-full max-h-full rounded-lg object-contain"
             >
               Your browser does not support the video tag.
             </video>
