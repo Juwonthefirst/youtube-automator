@@ -6,7 +6,6 @@ export default async function SchedulesPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Schedules</h1>
         <p className="text-black/60 dark:text-white/60 mt-2">
@@ -14,7 +13,6 @@ export default async function SchedulesPage() {
         </p>
       </div>
 
-      {/* Content */}
       <SchedulesList scheduleGroups={scheduleGroups} />
     </div>
   );
