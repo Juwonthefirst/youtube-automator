@@ -1,6 +1,6 @@
 import FileExplorer from "@/components/file-explorer";
 import { withRetry } from "@/utils/helper";
-import { handleS3Error, storage } from "@/utils/storage";
+import { handleS3Error, storage } from "@/utils/aws/storage";
 
 export const dynamic = "force-dynamic";
 export default async function Home() {

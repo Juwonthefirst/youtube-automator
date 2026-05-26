@@ -1,5 +1,5 @@
 import { geistSans } from "@/utils/fonts";
-import { Upload, UploadCloud } from "lucide-react";
+import { UploadCloud } from "lucide-react";
 import Link from "next/link";
 
 const Header = () => {
@@ -10,10 +10,16 @@ const Header = () => {
       </h1>
       <nav className="flex gap-6 items-center">
         <Link
-          className="hover:bg-black/10 dark:hover:bg-white/20 p-1.5 rounded-full"
+          className="text-sm font-medium hover:bg-black/10 dark:hover:bg-white/20 px-3 py-1.5 rounded-md transition-colors"
+          href="/schedules"
+        >
+          Schedules
+        </Link>
+        <Link
+          className="text-sm font-medium hover:bg-black/10 dark:hover:bg-white/20 px-3 py-1.5 rounded-md transition-colors"
           href="/upload/active"
         >
-          <Upload />
+          Active
         </Link>
         <Link
           href="/upload"

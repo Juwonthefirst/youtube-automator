@@ -1,4 +1,4 @@
-import { storage } from "@/utils/storage";
+import { storage } from "@/utils/aws/storage";
 import { NextResponse } from "next/server";
 
 export const DELETE = async (

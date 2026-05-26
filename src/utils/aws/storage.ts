@@ -1,5 +1,5 @@
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { StorageFolderInfo, UploadedPart, UploadMetadata } from "./types";
+import { StorageFolderInfo, UploadedPart, UploadMetadata } from "../types";
 import path from "path";
 import { notFound } from "next/navigation";
 import {

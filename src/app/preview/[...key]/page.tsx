@@ -1,5 +1,5 @@
 import FilePreviewModal from "@/components/file-preview-modal";
-import { storage } from "@/utils/storage";
+import { storage } from "@/utils/aws/storage";
 
 export default async function PreviewPage({
   params,

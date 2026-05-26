@@ -1,4 +1,4 @@
-import { storage } from "@/utils/storage";
+import { storage } from "@/utils/aws/storage";
 import { UploadMetadata } from "@/utils/types";
 import { NextResponse } from "next/server";
 
