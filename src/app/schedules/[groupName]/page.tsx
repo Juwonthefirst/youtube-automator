@@ -2,6 +2,7 @@ import SchedulesList from "@/components/schedules/schedules-list-group";
 import { scheduler } from "@/utils/aws/scheduler";
 import BackButton from "@/components/schedules/back-button";
 
+export const dynamic = "force-dynamic";
 export default async function GroupSchedulesPage({
   params,
 }: {

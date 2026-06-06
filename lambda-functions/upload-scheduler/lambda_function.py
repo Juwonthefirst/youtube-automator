@@ -13,7 +13,7 @@ s3 = boto3.client(
 )
 scheduler = boto3.client("scheduler")
 
-upload_hours = [21]
+upload_hours = [13, 18]
 
 
 def get_upload_hour_index_shift(current_hour: int):

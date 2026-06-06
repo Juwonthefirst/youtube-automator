@@ -1,8 +1,22 @@
 import os
+from pathlib import Path
 import boto3
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
+
+BASE_DIR = Path(__file__).parent
+
+
+def relative_to_absolute(path: str):
+    return BASE_DIR / path
+
+
+def create_absolute_path(path: str):
+    absolute_path = relative_to_absolute(path)
+    absolute_path.parent.mkdir(parents=True, exist_ok=True)
+    return absolute_path
+
 
 creds = Credentials(
     token=None,
@@ -13,7 +27,7 @@ creds = Credentials(
 )
 
 
-def upload_to_youtube(file_path: str, title: str, description: str):
+def upload_to_youtube(file_path: Path, title: str, description: str):
     youtube = build("youtube", "v3", credentials=creds)
     request = youtube.videos().insert(
         part="snippet,status",
@@ -28,6 +42,7 @@ def upload_to_youtube(file_path: str, title: str, description: str):
     return response["id"]
 
 
+print(os.getenv("S3_ENDPOINT_URL"))
 s3 = boto3.client(
     "s3",
     endpoint_url=os.getenv("S3_ENDPOINT_URL"),
@@ -44,7 +59,7 @@ def lambda_handler(event, context):
         Key = detail["key"]
     except KeyError:
         return {"statusCode": 400, "message": "Invalid Event"}
-    input_file_path = f"/tmp/{Key}"
+    input_file_path = create_absolute_path(f"./tmp/{Key}")
     try:
         response = s3.head_object(Bucket=bucket_name, Key=Key)
         metadata: dict = response["Metadata"]

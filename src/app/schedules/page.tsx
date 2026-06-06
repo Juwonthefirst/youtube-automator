@@ -1,6 +1,7 @@
 import SchedulesList from "@/components/schedules/schedules-list";
 import { scheduler } from "@/utils/aws/scheduler";
 
+export const dynamic = "force-dynamic";
 export default async function SchedulesPage() {
   const scheduleGroups = await scheduler.listScheduleGroups();
 
